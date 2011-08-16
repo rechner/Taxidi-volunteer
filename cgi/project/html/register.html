@@ -1,0 +1,254 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8" >
+<title>Taxidi | Register new user</title>
+<script type='text/javascript' src='dFilter.js'></script>
+</head>
+
+<body style="background-repeat:repeat-x; background-color:#ededed" background="pixmaps/background.png" >
+
+<img style="position:absolute; top:0px; left:-1px" src="pixmaps/header.png" width="361" height="240" alt="logo" >
+
+<a href="home.html"><img style="position:absolute; top:137px; left:70px" src="pixmaps/home.png" border="0" alt="Home"></a>
+<a href="search.html"><img style="POSITION: absolute; TOP: 137px; LEFT: 200px" border="0" src="pixmaps/search.png" ></a>
+<a href="#"><img style="POSITION: absolute; TOP: 137px; LEFT: 333px" border="0" src="pixmaps/register2.png" ></a>
+<a href="statistics.html"><img style="POSITION: absolute; TOP: 137px; LEFT: 464px" border="0" src="pixmaps/statistics.png" ></a>
+<a href="admin.html"><img style="POSITION: absolute; TOP: 137px; LEFT: 595px" border="0" src="pixmaps/admin.png"></a>
+
+
+<div style="text-align:right; font-family:verdana; color:#ffffff; font-size=3">
+Welcome, ~<b><a href="cgi-bin/usercp.cgi" style="color:#ffffff" >Username</a></b><br>
+<a href="cgi-bin/logout.cgi" style="color:#ffffff; font-size:80%">logout</a>
+</div>
+
+<DIV style="position: absolute; top:220px; left:50px; width:780px">
+<p style="font-family:verdana; font-size:80%">
+<p style="font-family:verdana; font-size:10pt; color:red">
+Fields in <b>bold</b> are required</p>
+
+
+
+	<form action="cgi-bin/submit-new.cgi" method="POST" >
+	
+	<table border=0 cellpadding="10" width="530">
+	<tr><td align="left">
+	<!-- this section needs to be dynamically generated -->
+	<label class="description" for="activity" style="font-family:verdana; font-size:13px;"><b>Activity</b> </label>
+	<select class="element select medium" id="activity" name="activity">
+		<option value="1" >Outfitters</option>
+		<option value="2" >Explorers</option>
+	</select>
+	</td><td align="center">
+	<label class="description" for="room" style="font-family:verdana; font-size:13px"><b>Room</b></label>
+	<select class="element select medium" id="room" name="room">
+		<option value="0">n/a</option>
+		<option value="1">Blue</option>
+		<option value="2">Green</option>
+		<option value="3">Yellow</option>
+	</select>
+	</td><td align="right">
+		<div style="font-family:verdana; font-size:13px">Image
+		<input id="picture" name="picture" class="element" type="file" value="Select..."  accept="image/gif,image/jpeg,image/png"
+		 style="width:100px"></div>
+	</td></tr>
+	</table>
+
+	<table border="0" cellpadding="10" width="530">
+	<tr><td align="left">
+	<label style="font-family:verdana; font-size:13px;"><b>First</b></label>
+    <input id="First" name= "first" class="element text" maxlength="255" size="23" value=""
+     style="font-family:verdana;font-size:10pt">
+    </td>
+
+	<td align="right">
+	<label style="font-family:verdana; font-size:13px; "><b>Last</b></label>
+	<input id="last" name= "last" class="element text" maxlength="255" size="23" value=""
+	 style="font-family:verdana;font-size:10pt">
+	</td></tr></table>
+
+
+	<table border="0" cellpadding="10" width="530" style="font-family:verdana; font-size:13px">
+	<tr><td align="left"><b>DOB:</b>
+
+	<!-- Date of birth -->
+		<label class="description" for="day">Day </label>
+		<select class="element select medium" id="day" name="day"> 
+			<option value="" selected="selected">--</option>
+			<option value="1" >1</option>
+			<option value="2" >2</option>
+			<option value="3" >3</option>
+			<option value="4" >4</option>
+			<option value="5" >5</option>
+			<option value="6" >6</option>
+			<option value="7" >7</option>
+			<option value="8" >8</option>
+			<option value="9" >9</option>
+			<option value="10" >10</option>
+			<option value="11" >11</option>
+			<option value="12" >12</option>
+			<option value="13" >13</option>
+			<option value="14" >14</option>
+			<option value="15" >15</option>
+			<option value="16" >16</option>
+			<option value="17" >17</option>
+			<option value="18" >18</option>
+			<option value="19" >19</option>
+			<option value="20" >20</option>
+			<option value="21" >21</option>
+			<option value="22" >22</option>
+			<option value="23" >23</option>
+			<option value="24" >24</option>
+			<option value="25" >25</option>
+			<option value="26" >26</option>
+			<option value="27" >27</option>
+			<option value="28" >28</option>
+			<option value="29" >29</option>
+			<option value="30" >30</option>
+			<option value="31" >31</option>
+		</select>
+		
+		<label class="description" for="month">Month </label>
+		<select class="element select medium" id="month" name="month"> 
+			<option value="" selected="selected">--</option>
+			<option value="1" >January</option>
+			<option value="2" >February</option>
+			<option value="3" >March</option>
+			<option value="4" >April</option>
+			<option value="5" >May</option>
+			<option value="6" >June</option>
+			<option value="7" >July</option>
+			<option value="8" >August</option>
+			<option value="9" >September</option>
+			<option value="10" >October</option>
+			<option value="11" >November</option>
+			<option value="12" >December</option>
+		</select>
+
+		<label class="description" for="year">Year </label>
+		<select class="element select medium" id="year" name="year">
+			<option value="" selected="selected">----</option>
+			<option value="2012" >2012</option>
+			<option value="2011" >2011</option>
+			<option value="2010" >2010</option>
+			<option value="2009" >2009</option>
+			<option value="2008" >2008</option>
+			<option value="2007" >2007</option>
+			<option value="2006" >2006</option>
+			<option value="2005" >2005</option>
+			<option value="2004" >2004</option>
+			<option value="2003" >2003</option>
+			<option value="2002" >2002</option>
+			<option value="2001" >2001</option>
+			<option value="2000" >2000</option>
+			<option value="1999" >1999</option>
+			<option value="1998" >1998</option>
+			<option value="1997" >1997</option>
+			<option value="1996" >1996</option>
+			<option value="1995" >1995</option>
+			<option value="1994" >1994</option>
+			<option value="1993" >1993</option>
+			<option value="1992" >1992</option>
+		</select>
+	
+		</td><td align="right">
+
+	<label class="description" for="grade"><b>Grade</b> </label>
+	<input id="grade" name="grade" class="text" type="text" maxlength="3" value="" size="2"
+	 style="font-family:verdana;font-size:10pt">
+	</tr></table>
+	
+	
+	<table border="0" cellpadding="10" width="530" style="font-family:verdana; font-size:12px">
+		<tr><td align="left">	
+			<label class="description" for="phone"><b>Phone</b> </label>
+			<input id="phone" name="phone" class="element text" size="9" maxlength="9" type="text"
+			onKeyDown="javascript:return dFilter (event.keyCode, this, '(###) ###-####');"
+			style="font-family:verdana;font-size:10pt;width:110px;">
+		</td>
+	
+		<td align="center">
+			<label class="description" for="mobile">Mobile </label>
+			<input id="mobile" name="mobile" class="element text" size="9" maxlength="9" type="text"
+			onKeyDown="javascript:return dFilter (event.keyCode, this, '(###) ###-####');"
+			style="font-family:verdana;font-size:10pt;width:110px;">
+		</td>
+		
+		<!-- dynamically generate content from mobile carrier email gateway database -->
+		<td align="right">
+			<label class="description" for="carrier">Carrier</label>
+			<select class="element select medium" id="carrier" name="carrier">
+				<option value="" selected="selected">(select)</option>
+				<option value="0">AT&amp;T</option>
+				<option value="1">Verizon</option>
+				<option value="2">Vodafone</option>
+				<option value=""></option>
+				<option value="">Not listed</option>
+			</select>
+		</td></tr>
+	</table>
+	
+	<table border=0 cellpadding=10 width=530 style="font-family:verdana; font-size:13px">
+		<tr><td align="left">
+			<label class="description" for="email">E-Mail</label>
+			<input id="email" name="email" class="element text" size="35" maxlength="255" type="text"
+			 style="font-family:verdana;font-size:10pt;">
+		</td><td align="right">
+			<input type="checkbox" name="notify" value="notify"> Notify on check-in
+		</td></tr>
+	</table>
+	
+
+	<table border="0" cellpadding="10" width="530" style="font-family:verdana; font-size:13px">
+		<tr><td align="left">
+			<label class="description" for="parent1"><b>Parent 1</b> </label>
+			<input id="parent1" name="parent1" class="element text medium" type="text" maxlength="255" size=22 
+			 style="font-family:verdana;font-size:10pt" >
+		</td>
+		
+		<td align="right">
+			<label class="description" for="parent2">Parent 2 </label>
+			<input id="parent2" name="parent2" class="element text medium" type="text" maxlength="255" size=22
+			 style="font-family:verdana;font-size:10pt" >
+		</td></tr>
+	</table>
+	
+	<table border=0 cellpadding=10 width=500 style="font-family:verdana; font-size:13px">
+		<tr><td align="left">
+			<label class="description" for="medical">Medical </label>
+            <input id="medical" name="medical" class="element text large" type="text" maxlength="520" size=45 >
+		</td>
+		
+		<td align="right">
+			<input type="checkbox" name="visitor" value="visitor" > Visitor
+		</td></tr>
+	</table>
+
+	<table border=0 cellpadding=10 width=500 style="font-family:verdana; font-size:13px">
+		<tr><td align="left">
+			<input id="submit" class="button_text" type="submit" name="submit" value="Save" style="width:100px;height:40px">
+			<input id="cancel" class="button_text" type="button" name="cancel" value="Cancel" style="width:100px;height:40px"
+			 onClick="parent.location='home.html'">
+		</td></tr>
+	</table>
+
+	<input type="hidden" name="form_id" value="register" >
+	</form>
+	
+	
+</div>
+
+<script language="JavaScript" type="text/javascript">
+<!--
+function set_focus()
+{
+    document.forms[0].first.focus();
+}
+
+set_focus();
+//-->
+</script>
+
+</body>
+</html>
+

@@ -1,0 +1,21 @@
+- HTML interface using python CGI
+- User authentication; session keys
+- Kiosk authentication
+- SQL driver
+- SQLite3
+
+Dream Team Checkin
+"Helping Others take a closer step towards Christ"
+
+- Who was there for what service
+- Where they are serving.  (Area where you're making a difference today?)
+- Tabulate and send to info.journeychurch.gmail.com
+
+TABLES:
+- Data
+- Services
+- Ministries
+- Mobile carriers
+
+
+- Statistics by room (count for assigned room)

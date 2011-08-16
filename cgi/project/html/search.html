@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8" >
+<title>Taxidi | Search</title>
+<script type='text/javascript' src='dFilter.js'></script>
+</head>
+
+<body style="background-repeat:repeat-x; background-color:#ededed" background="pixmaps/background.png" >
+
+<img style="position:absolute; top:0px; left:-1px" src="pixmaps/header.png" width="361" height="240" alt="logo" >
+
+<a href="home.html"><img style="position:absolute; top:137px; left:70px" src="pixmaps/home.png" border="0" alt="Home"></a>
+<a href="#"><img style="POSITION: absolute; TOP: 137px; LEFT: 200px" border="0" src="pixmaps/search2.png" ></a>
+<a href="register.html"><img style="POSITION: absolute; TOP: 137px; LEFT: 333px" border="0" src="pixmaps/register.png" ></a>
+<a href="statistics.html"><img style="POSITION: absolute; TOP: 137px; LEFT: 464px" border="0" src="pixmaps/statistics.png" ></a>
+<a href="admin.html"><img style="POSITION: absolute; TOP: 137px; LEFT: 595px" border="0" src="pixmaps/admin.png"></a>
+
+<div style="text-align:right; font-family:verdana; color:#ffffff; font-size=3">
+Welcome, ~<b><a href="cgi-bin/usercp.cgi" style="color:#ffffff" >Username</a></b><br>
+<a href="cgi-bin/logout.cgi" style="color:#ffffff; font-size:80%">logout</a>
+</div>
+
+<DIV style="position: absolute; top:220px; left:50px; font-family:verdana">
+
+<form action="cgi-bin/submit-new.cgi" method="POST" >
+	<table border=0 cellpadding=10>
+		<tr><td style="font-family:verdana">
+			<input type="text" id="search" name="search" maxlength="255" size="35" value="" style="height:40px; font-size:26px">
+		</td><td style="font-family:verdana">
+			<input type="submit" value="Search" style="height:45px; width:110px">
+		</td></tr>
+	</table>
+	<table border=0 cellpadding=5 style="font-size:13px">
+		<tr>
+			<td align="left">Search by:</td>
+			<td align="center"><input type="checkbox" name="last" checked> Lastname </td>
+			<td align="center"><input type="checkbox" name="first"> Firstname </td>
+			<td align="center"><input type="checkbox" name="id" checked> ID/Barcode</td>
+			<td align="center"><input type="checkbox" name="phone" checked> Phone</td>
+			<td align="center"><input type="checkbox" name="email"> E-Mail</td>
+		</tr>
+	</table>
+</form>
+
+</div>
+
+
+<script language="JavaScript" type="text/javascript">
+<!--
+function set_focus()
+{
+    document.forms[0].search.focus();
+}
+
+set_focus();
+//-->
+</script>
+
+</body>
+</html>

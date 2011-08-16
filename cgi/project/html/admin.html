@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8" >
+<title>Taxidi | Administration</title>
+<script type='text/javascript' src='dFilter.js'></script>
+</head>
+
+<body style="background-repeat:repeat-x; background-color:#ededed" background="pixmaps/background.png" >
+
+<img style="position:absolute; top:0px; left:-1px" src="pixmaps/header.png" width="361" height="240" alt="logo" >
+
+<a href="home.html"><img style="position:absolute; top:137px; left:70px" src="pixmaps/home.png" border="0" alt="Home"></a>
+<a href="search.html"><img style="POSITION: absolute; TOP: 137px; LEFT: 200px" border="0" src="pixmaps/search.png" ></a>
+<a href="register.html"><img style="POSITION: absolute; TOP: 137px; LEFT: 333px" border="0" src="pixmaps/register.png" ></a>
+<a href="statistics.html"><img style="POSITION: absolute; TOP: 137px; LEFT: 464px" border="0" src="pixmaps/statistics.png" ></a>
+<a href="#"><img style="POSITION: absolute; TOP: 137px; LEFT: 595px" border="0" src="pixmaps/admin2.png"></a>
+
+<div style="text-align:right; font-family:verdana; color:#ffffff; font-size=3">
+Welcome, ~<b><a href="cgi-bin/usercp.cgi" style="color:#ffffff" >Username</a></b><br>
+<a href="cgi-bin/logout.cgi" style="color:#ffffff; font-size:80%">logout</a>
+</div>
+
+<DIV style="position: absolute; top:220px; left:50px; width:780px; font-family:verdana; font-size:14px">
+
+<h3>User management</h3>
+
+<table border=0 style="font-family:verdana; font-size:13px" cellpadding=10>
+<tr><td>
+
+<b>Add user</b>
+<form action="/cgi-bin/adduser.py" method="POST">
+<table border=0 style="font-family:verdana; font-size:13px">
+  <tr><td align="right">
+		<label style="font-family:verdana; font-size:13px;" for="user">Username</label>
+	</td><td align="left">
+    	<input id="user" name= "user" class="element text" maxlength="255" size="14" value=""
+     	style="font-family:verdana;font-size:10pt">
+	</td>
+  </tr>
+  <tr><td align="right">
+  		<label style="font-family:verdana; font-size:13px;" for="pass">Password</label>
+	</td><td align="left">
+	    <input id="pass" type="password" name= "pass" class="element text" maxlength="255" size="14" value=""
+    	 style="font-family:verdana;font-size:10pt">
+	</td>
+  </tr>
+  <tr><td align="right">
+		<label style="font-family:verdana; font-size:13px;" for="pass">Confirm</label>
+	</td><td align="left">
+    	<input id="confirm" type="password" name= "confirm" class="element text" maxlength="255" size="14" value=""
+    	 style="font-family:verdana;font-size:10pt">
+	</td>
+  </tr>
+  <tr><td></td>
+  <td align="center">
+	<input type="submit" value="Add user">
+  </td></tr>
+</table>
+</form>
+
+</td><td>
+
+<b>Manage/Delete user</b>
+<form action="/cgi-bin/deluser.py" method="POST">
+<table border=0 style="font-family:verdana; font-size:13px">
+<tr><td>
+	<select size="2" style="width:160px; height:100px">
+		<option value=0>root</option>
+		<option value=1>wwwadmin</option>
+		<option value=2>greenroom</option>
+		<option value=3>karen</option>
+		<option value=4>zac</option>
+		<option value=5>user1</option>
+		<option value=6>user2</option>
+	</select>
+</tr></td>
+<tr><td>
+<table border=0 style="font-family:verdana; font-size:13px; width:160px">
+<tr><td align="center">
+	<input name="manage" type="submit" value="Manage">
+  </td><td align="center">
+	<input name="delete" type="submit" value="Delete">
+</td></tr>
+</table>
+</tr></td>
+</table>
+</form>
+
+</td></tr></table>
+
+</div>
+</body>
+</html>
