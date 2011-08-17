@@ -35,7 +35,7 @@ import os
 
 programName = "Taxidi"  #python does not care what type a variable is. No more var$ <> var.
 programVersion = "0.0.1b"
-fullScreen = 1
+fullScreen = 0
 windowX = 1020
 windowY = 720
 banner="resources/banner.png"
@@ -51,20 +51,22 @@ class Main(wx.Frame):
 				style=wx.MINIMIZE_BOX|wx.SYSTEM_MENU|
 					wx.CAPTION|wx.CLOSE_BOX|wx.CLIP_CHILDREN)
 			
-		self.SetBackgroundColour("0,0,0") 
+		self.SetBackgroundColour("black") 
 		self.ClearBackground()
 		imageLeft = self.GetClientSize()[0] - 1020
 		
+		global displayCenter
+		displayCenter = int((self.GetClientSize()[0])/2)
+		
 		wximg = wx.Image(banner) # Load background image
 		#wximg.Rescale(self.GetClientSize()[0], self.GetClientSize()[1])) # rescale to fit screen
-		wximg.Resize(self.GetClientSize(), (imageLeft/2, 0))
+		#wximg.Resize(self.GetClientSize(), (imageLeft/2, 0))
 		wxbanner=wximg.ConvertToBitmap() # convert to a bit map
-		wx.StaticBitmap(self,-1,wxbanner,(wximg.GetWidth()-1020,0))  # write the bitmap to self
+		wx.StaticBitmap(self,-1,wxbanner,(imageLeft,0))  # write the bitmap to self
 		self.SetTitle(programName+" ("+programVersion+")")
 		self.Show(True)
 		
-		global displayCenter
-		displayCenter = int((self.GetClientSize()[0])/2)
+		
 		
 		#wx.MessageBox(str(wx.DisplaySize()[0]), 'Info')  
 		#main menu buttons:  buttonStart, buttonKiosk, buttonManage, buttonConfigure, buttonAbout, buttonQuit
