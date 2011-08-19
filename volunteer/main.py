@@ -2,6 +2,9 @@
 #-*- coding:utf-8 -*-
 
 import wx
+import conf
+
+print conf.get()
 
 # globals (these will be placed in a config file)
 programName = 'Journey Volunteer Check-in'
@@ -71,8 +74,6 @@ class Main(wx.Frame):
 		self.searchb.SetToolTip(wx.ToolTip("Prints a name tag without entering into the permanent database"))
 		
 		self.searchb = wx.Button(self, id=-1, label='Last Search', pos=(displayCentre+300, 379), size=(180, 60))
-		#self.searchb.Bind(wx.EVT_BUTTON, self.button3Click)
-		# optional tooltip
 		self.searchb.SetToolTip(wx.ToolTip("Register a new entry"))
 		
 		self.stat = wx.Button(self, id=-1, label='View/Print Report', pos=(displayCentre-480, 314), size=(260, 60))
@@ -123,6 +124,52 @@ class Main(wx.Frame):
 		application.ExitMainLoop()
 		
 	def b1Click(self, event):
+		self.search.AppendText('1')
+		self.search.SetFocus()
+		
+	def b2Click(self, event):
+		self.search.AppendText('2')
+		self.search.SetFocus()
+		
+	def b3Click(self, event):
+		self.search.AppendText('3')
+		self.search.SetFocus()
+		
+	def b4Click(self, event):
+		self.search.AppendText('4')
+		self.search.SetFocus()
+		
+	def b5Click(self, event):
+		self.search.AppendText('5')
+		self.search.SetFocus()
+		
+	def b6Click(self, event):
+		self.search.AppendText('6')
+		self.search.SetFocus()
+		
+	def b7Click(self, event):
+		self.search.AppendText('7')
+		self.search.SetFocus()
+		
+	def b8Click(self, event):
+		self.search.AppendText('8')
+		self.search.SetFocus()
+		
+	def b9Click(self, event):
+		self.search.AppendText('9')
+		self.search.SetFocus()
+		
+	def b0Click(self, event):
+		self.search.AppendText('0')
+		self.search.SetFocus()
+		
+	def bAllClick(self, event):
+		self.search.SetValue('')
+		#code to execute blank query
+	
+	def bClrClick(self, event):
+		self.search.SetValue('')
+		self.search.SetFocus()
 		
 		
 		

@@ -26,7 +26,7 @@ class Taxidi:
 			fh = open(file)
 			fh.close()
 		except IOError as e:
-			#print("({})".format(e))
+			print("({0})".format(e))
 			print "Warning: database file does not exist; creating "+file
 			#file does not exist, so create the table.
 			self.conn = sqlite3.connect(file)

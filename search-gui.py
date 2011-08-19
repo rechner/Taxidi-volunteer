@@ -23,7 +23,7 @@ class Search(wx.Frame):
 			wx.Frame.__init__(self, None, wx.ID_ANY, 'wxButton', pos=(0,0), size=(windowX, windowY),
 					style=wx.MINIMIZE_BOX|wx.SYSTEM_MENU|wx.CAPTION|wx.CLOSE_BOX|wx.CLIP_CHILDREN)
 		
-		self.SetBackgroundColour("0,0,0") 
+		self.SetBackgroundColour("#E3D2B4") 
 		self.ClearBackground()
 		imageLeft = self.GetClientSize()[0] - 1020
 		
@@ -42,7 +42,7 @@ class Search(wx.Frame):
 	
 		self.st1 = wx.StaticText(self, -1, "Search:", pos=(displayCenter-490, 192))
 		self.st1.SetFont(font1)
-		self.st1.SetForegroundColour('white')
+		self.st1.SetForegroundColour('black')
 		
 		#search text entry
 		entryfont = wx.Font(24, wx.SWISS, wx.NORMAL, wx.NORMAL, False, u'Arial')
@@ -57,11 +57,11 @@ class Search(wx.Frame):
 		# optional tooltip
 		self.searchb.SetToolTip(wx.ToolTip("Search for a record"))
 		
-		self.searchb = wx.Button(self, id=-1, label='Register',
+		self.register = wx.Button(self, id=-1, label='Register',
 			pos=(displayCenter+300, 249), size=(180, 60))
-		#self.searchb.Bind(wx.EVT_BUTTON, self.button3Click)
+		#self.register.Bind(wx.EVT_BUTTON, self.button3Click)
 		# optional tooltip
-		self.searchb.SetToolTip(wx.ToolTip("Register a new record (complete)"))
+		self.register.SetToolTip(wx.ToolTip("Register a new record (complete)"))
 		
 		self.searchb = wx.Button(self, id=-1, label='Visitor',
 			pos=(displayCenter+300, 314), size=(180, 60))
@@ -73,12 +73,14 @@ class Search(wx.Frame):
 		# optional tooltip
 		self.searchb.SetToolTip(wx.ToolTip("Register a new entry"))
 		
+		self.stat = wx.Button(self, id=-1, label='Current Statistics', pos=(displayCenter-480, 314), size=(245, 60))
+		
+		self.
 	
-		self.searchb = wx.Button(self, id=-1, label='Exit',	pos=(displayCenter-200, 379), size=(180, 60))
-		#self.searchb.Bind(wx.EVT_BUTTON, self.button3Click)
-		self.searchb.SetToolTip(wx.ToolTip("Prints a name tag without entering into the permanent database"))
+		self.exitb = wx.Button(self, id=-1, label='Exit',	pos=(displayCenter-200, 314), size=(245, 60))
+		self.exitb.Bind(wx.EVT_BUTTON, self.close)
 		
-		
+				
 		self.b1 = wx.Button(self, id=-1, label='1',  pos=(displayCenter+90, 184), size=(60, 60))	
 		self.b1.Bind(wx.EVT_BUTTON, self.b1Click)
 		self.b2 = wx.Button(self, id=-1, label='2', pos=(displayCenter+155, 184), size=(60, 60))
@@ -108,9 +110,9 @@ class Search(wx.Frame):
 	def b1Click(self, event):
 		print "1"
 
-
-		#self.Close()
-		#application.ExitMainLoop()
+	def close(self, event):
+		self.Close()
+		application.ExitMainLoop()
 
 application = wx.PySimpleApp()
 # call class MyFrame
