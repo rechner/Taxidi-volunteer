@@ -52,8 +52,8 @@ class Taxidi:
 			lName text, PhoneArea integer, PhonePre integer, PhonePrimary integer, Barcode text)""")
 			self.cursor.execute("CREATE TABLE services(id integer primary key, Description text)")
 			self.cursor.execute("CREATE TABLE ministries(id integer primary key, Description text, Note)")
-			self.cursor.execute("""CREATE TABLE statistics(id integer primary key, Name text, lName text, 
-			Ministry text, services text)""")
+			self.cursor.execute("""CREATE TABLE statistics(id integer primary key, record integer, Name text, lName text, 
+			ministries text, services text, date text, time text)""")
 		except:
 			print "TaxidiDB: Some tables already created, skipping..."
 	def returnEntries(self):

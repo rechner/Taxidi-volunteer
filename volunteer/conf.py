@@ -20,7 +20,7 @@ def create():
 	config['banner'] = 'resources/banner.png'
 	config['backgroundColour'] = '#E3D2B4'
 	config['password'] = False
-	conifg['hash'] = '0d890f617f6b897a3998b9f92138b70fda10a332'
+	config['hash'] = '0d890f617f6b897a3998b9f92138b70fda10a332'
 	config.write()
 
 def get():
