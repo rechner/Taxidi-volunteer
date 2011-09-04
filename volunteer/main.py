@@ -25,6 +25,8 @@ import wx
 from wx.lib.masked import TextCtrl as maskedTextCtrl
 import conf
 import datetime
+import conf
+
 
 def as_bool(inp):
 	if inp == 'True':
@@ -373,7 +375,7 @@ digits of phone number, or scan barcode.""",
 	def bClrClick(self, event):
 		self.search.SetValue('')
 		self.search.SetFocus()
-		
+
 		
 	def query(self, event):
 		global resultList #so other functions can access the list
@@ -649,8 +651,7 @@ digits of phone number, or scan barcode.""",
 		f.close()
 		return 0
 	
-		
-		
+
 		
 		
 application = wx.PySimpleApp()

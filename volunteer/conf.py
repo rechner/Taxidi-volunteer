@@ -27,3 +27,6 @@ def get():
     if not os.path.exists(inifile):
         create()
     return configobj.ConfigObj(inifile)
+
+print create()
+print get()

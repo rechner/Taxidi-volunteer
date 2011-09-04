@@ -74,7 +74,6 @@ class Search(wx.Frame):
 		self.searchb.SetToolTip(wx.ToolTip("Register a new entry"))
 		
 		self.stat = wx.Button(self, id=-1, label='Current Statistics', pos=(displayCenter-480, 314), size=(245, 60))
-		
 	
 		self.exitb = wx.Button(self, id=-1, label='Exit',	pos=(displayCenter-200, 314), size=(245, 60))
 		self.exitb.Bind(wx.EVT_BUTTON, self.close)
