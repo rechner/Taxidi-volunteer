@@ -19,6 +19,9 @@
 
 # Notes:
 # Perhaps each "page" should be organized into separate classes?
+# Full screen was broken when panel was added.  Style problem?
+# (Panel needed for tab-traversal. Perhaps we can 'full screen' it
+# 	just by calling it in X11 with no WM and size=Wx.DisplaySize() )
 
 
 import wx
@@ -72,7 +75,7 @@ class Main(wx.Frame):
 			self.ShowFullScreen(True)
 			imageLeft = wx.DisplaySize()[0] - 1020
 		else:
-			wx.Frame.__init__(self, None, wx.ID_ANY, 'wxButton', 
+			wx.Frame.__init__(self, None, wx.ID_ANY, 'Taxidi', 
 				pos=(0,0), size=(windowX, windowY),
 				style=wx.MINIMIZE_BOX|wx.SYSTEM_MENU|
 				wx.CAPTION|wx.CLOSE_BOX|wx.TAB_TRAVERSAL|wx.WANTS_CHARS)
@@ -116,31 +119,31 @@ digits of phone number, or scan barcode.""",
 		self.searchb = wx.Button(self.panel, id=-1, label='Search',
     	    pos=(displayCentre+300, 184), size=(180, 60))
 		self.searchb.Bind(wx.EVT_BUTTON, self.query)
-		# optional tooltip
 		self.searchb.SetToolTip(wx.ToolTip("Search for a record"))
 		
 		self.register = wx.Button(self.panel, id=-1, label='Register',
 			pos=(displayCentre+300, 249), size=(180, 60))
-		#self.register.Bind(wx.EVT_BUTTON, self.button3Click)
-		# optional tooltip
+		self.register.Bind(wx.EVT_BUTTON, self.Register)
 		self.register.SetToolTip(wx.ToolTip("Register a new record (complete)"))
 		
-		self.visitor = wx.Button(self.panel, id=-1, label='Visitor',
+		self.lastb = wx.Button(self.panel, id=-1, label='Last Search', 
 			pos=(displayCentre+300, 314), size=(180, 60))
-		#self.searchb.Bind(wx.EVT_BUTTON, self.button3Click)
-		self.visitor.SetToolTip(wx.ToolTip("Prints a name tag without entering into the permanent database"))
-		
-		self.lastb = wx.Button(self.panel, id=-1, label='Last Search', pos=(displayCentre+300, 379), size=(180, 60))
 		self.lastb.SetToolTip(wx.ToolTip("Register a new entry"))
 		
-		self.stat = wx.Button(self.panel, id=-1, label='View/Print Report', pos=(displayCentre-480, 314), size=(260, 60))
+		self.stat = wx.Button(self.panel, id=-1, 
+			label='View/Print Report', pos=(displayCentre-480, 379), 
+			size=(260, 60))
 	
-		self.exitb = wx.Button(self.panel, id=-1, label='Exit',	pos=(displayCentre-210, 314), size=(260, 60))
+		self.exitb = wx.Button(self.panel, id=-1, label='Exit',	
+			pos=(displayCentre-210, 379), size=(260, 60))
 		self.exitb.Bind(wx.EVT_BUTTON, self.close)
 		
-		self.config = wx.Button(self.panel, id=-1, label='Configuration', pos=(displayCentre-480, 379), size=(260, 60))
+		#self.config = wx.Button(self.panel, id=-1, 
+			#label='Configuration', pos=(displayCentre-480, 314), 
+			#size=(260, 60))
 		
-		self.lock = wx.Button(self.panel, id=-1, label='Lock screen', pos=(displayCentre-210, 379), size=(260, 60))	
+		#self.lock = wx.Button(self.panel, id=-1, label='Lock screen', 
+			#pos=(displayCentre-210, 379), size=(260, 60))	
 		
 				
 		self.b1 = wx.Button(self.panel, id=-1, label='1',  pos=(displayCentre+90, 184), size=(60, 60))	
@@ -257,7 +260,7 @@ digits of phone number, or scan barcode.""",
 		self.back3b.Bind(wx.EVT_BUTTON, self.backToServices)
 		
 		#final reveiw page
-		self.reviewText = wx.StaticText(self.panel, -1, "bleh", 
+		self.reviewText = wx.StaticText(self.panel, -1, "", 
 			pos=((displayCentre-460), 250))
 		self.reviewText.SetFont(font3)
 		
@@ -309,19 +312,21 @@ digits of phone number, or scan barcode.""",
 			'Clear', size=(50, 50), pos=((displayCentre+330), 254))
 			
 		self.registerAccept = wx.Button(self.panel, wx.ID_SAVE,
-			size=(200, 60), pos=((displayCentre), 580))
+			size=(200, 60), pos=((displayCentre+210), 580))
 			
 		self.registerCancel = wx.Button(self.panel, wx.ID_CANCEL,
-			size=(200, 60), pos=((displayCentre+210), 580))
+			size=(200, 60), pos=((displayCentre), 580))
+		self.registerCancel.Bind(wx.EVT_BUTTON, self.registerCleanup)
+			
 		
-		
-		
-		self.hideSearch()	
+		#self.hideSearch()	
 		self.hideResult()
 		self.hideServices()
 		self.hideMinistries()
 		self.hideFinish()
-		
+		self.hideRegister()
+		#self.showRegister()
+
 		
 	#functions
 	def close(self, event):
@@ -370,7 +375,7 @@ digits of phone number, or scan barcode.""",
 		
 	def bAllClick(self, event):
 		self.search.SetValue('')
-		#code to execute blank query
+		self.query(self)
 	
 	def bClrClick(self, event):
 		self.search.SetValue('')
@@ -383,6 +388,10 @@ digits of phone number, or scan barcode.""",
 		resultList = self.query_test(query)
 		if len(resultList) == 0:
 			#display an error: No search results for '%s'
+			self.statusText.SetLabel('No results for "%s"' % query)
+			self.statusText.SetForegroundColour('dark red')
+			self.search.SelectAll()
+			self.search.SetFocus()
 			return 1
 		
 		for i in resultList:
@@ -499,11 +508,8 @@ digits of phone number, or scan barcode.""",
 		self.statusText.Hide()
 		self.searchb.Hide()
 		self.register.Hide()
-		self.config.Hide()
-		self.lock.Hide()
 		self.exitb.Hide()
 		self.stat.Hide()
-		self.visitor.Hide()
 		self.lastb.Hide()
 		
 	def showSearch(self):
@@ -524,12 +530,13 @@ digits of phone number, or scan barcode.""",
 		self.statusText.Show()
 		self.searchb.Show()
 		self.register.Show()
-		self.config.Show()
-		self.lock.Show()
 		self.exitb.Show()
 		self.stat.Show()
-		self.visitor.Show()
 		self.lastb.Show()
+		self.search.SetFocus()
+		self.statusText.SetLabel("""Ready: To begin, search by name, last four 
+digits of phone number, or scan barcode.""")
+		self.statusText.SetForegroundColour('dark green')
 		
 	def hideResult(self):
 		self.listBox.Hide()
@@ -551,6 +558,7 @@ digits of phone number, or scan barcode.""",
 		self.back2b.Show()
 		for i in self.serviceButtons:
 			i.Show()
+		self.serviceButtons[0].SetFocus()
 		
 	def hideServices(self):
 		self.st2.Hide()
@@ -573,6 +581,7 @@ digits of phone number, or scan barcode.""",
 		self.back3b.Show()
 		for i in self.ministryButtons:
 			i.Show()
+		self.ministryButtons[0].SetFocus()
 			
 	def hideFinish(self):
 		self.st2.Hide()
@@ -586,6 +595,46 @@ digits of phone number, or scan barcode.""",
 		self.reviewText.Show()
 		self.next4b.Show()
 		self.back4b.Show()
+		self.next4b.SetFocus()
+		
+	def hideRegister(self):
+		self.registerFirst.Hide()
+		self.registerLast.Hide()
+		self.registerPhone.Hide()
+		self.registerBarcode.Hide()
+		self.registerBarcodeClear.Hide()
+		self.registerAccept.Hide()
+		self.registerCancel.Hide()
+		self.registerSt1.Hide()
+		self.registerSt2.Hide()
+		self.registerSt3.Hide()
+		self.registerSt4.Hide()
+		
+	def showRegister(self):
+		self.registerFirst.Show()
+		self.registerLast.Show()
+		self.registerPhone.Show()
+		self.registerBarcode.Show()
+		self.registerBarcodeClear.Show()
+		self.registerAccept.Show()
+		self.registerCancel.Show()
+		self.registerSt1.Show()
+		self.registerSt2.Show()
+		self.registerSt3.Show()
+		self.registerSt4.Show()
+		self.registerFirst.SetFocus()
+		
+	def registerCleanup(self, event):
+		self.registerFirst.SetValue('')
+		self.registerLast.SetValue('')
+		self.registerPhone.SetValue('')
+		self.registerBarcode.SetValue('')
+		self.hideRegister()
+		self.showSearch()
+		
+	def Register(self, event):
+		self.hideSearch()
+		self.showRegister()		
 	
 	def toggleService(self, Event, button):
 		global selectedServices
