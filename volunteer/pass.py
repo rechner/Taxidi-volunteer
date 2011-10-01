@@ -1,23 +1,24 @@
-from wxPython.wx import * 
+#from wxPython.wx import * 
+import wx
 import sha 
 
-class LoginDialog(wxDialog): 
+class LoginDialog(wx.Dialog): 
     def __init__(self, parent, id=-1, title="Login", 
-                 pos=wxDefaultPosition, 
-                 size=wxSize(250, 150)): 
-        wxDialog.__init__(self, parent, id, title, pos, size) 
-        wxStaticText(self, -1, 'Please type your user name and password.', 
+                 pos=wx.DefaultPosition, 
+                 size=wx.Size(250, 150)): 
+        wx.Dialog.__init__(self, parent, id, title, pos, size) 
+        wx.StaticText(self, -1, 'Please type your user name and password.', 
                      wxPoint(15, 5)) 
-        wxStaticText(self, -1, 'User name: ', wxPoint(20, 30)) 
-        wxStaticText(self, -1, 'Password: ', wxPoint(20, 55)) 
-        self.nameBox = wxTextCtrl(self, -1, '', wxPoint(80,30), 
-                                  wxSize(120, -1)) 
-        self.passwordBox = wxTextCtrl(self, -1, '', wxPoint(80,55), 
-                                 wxSize(120, -1), style=wxTE_PASSWORD) 
-        wxButton(self, wxID_OK,     ' OK ', wxPoint(35, 90), 
-                 wxDefaultSize).SetDefault() 
-        wxButton(self, wxID_CANCEL, ' Cancel ', wxPoint(135, 90), 
-                 wxDefaultSize) 
+        wx.StaticText(self, -1, 'User name: ', wx.Point(20, 30)) 
+        wx.StaticText(self, -1, 'Password: ', wx.Point(20, 55)) 
+        self.nameBox = wx.TextCtrl(self, -1, '', wx.Point(80,30), 
+                                  wx.Size(120, -1)) 
+        self.passwordBox = wx.TextCtrl(self, -1, '', wx.Point(80,55), 
+                                 wx.Size(120, -1), style=wx.TE_PASSWORD) 
+        wx.Button(self, wx.ID_OK,     ' OK ', wx.Point(35, 90), 
+                 wx.DefaultSize).SetDefault() 
+        wx.Button(self, wxID_CANCEL, ' Cancel ', wx.Point(135, 90), 
+                 wx.DefaultSize) 
 
     def GetUser(self): 
         val = self.ShowModal() 
@@ -29,9 +30,9 @@ class LoginDialog(wxDialog):
         else: 
             return None 
 
-class testLogin(wxApp): 
+class testLogin(wx.Frame): 
     def OnInit(self): 
-        main = wxFrame(None, -1, 'Main Frame') 
+        main = wx.Frame(None, -1, 'Main Frame') 
         main.Show(true) 
         self.SetTopWindow(main) 
         login = LoginDialog(main) 
@@ -39,5 +40,7 @@ class testLogin(wxApp):
         print user 
         return true 
 
-app = testLogin(0) 
-app.MainLoop() 
+app = wx.PySimpleApp()
+window = testLogin()
+app.MainLoop()
+

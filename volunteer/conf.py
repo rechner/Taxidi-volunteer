@@ -28,5 +28,3 @@ def get():
         create()
     return configobj.ConfigObj(inifile)
 
-print create()
-print get()

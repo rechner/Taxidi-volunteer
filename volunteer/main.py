@@ -1,20 +1,20 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 
-#       This program is free software; you can redistribute it and/or modify
-#       it under the terms of the GNU General Public License as published by
-#       the Free Software Foundation; either version 2 of the License, or
-#       (at your option) any later version.
-#       
-#       This program is distributed in the hope that it will be useful,
-#       but WITHOUT ANY WARRANTY; without even the implied warranty of
-#       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#       GNU General Public License for more details.
-#       
-#       You should have received a copy of the GNU General Public License
-#       along with this program; if not, write to the Free Software
-#       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-#       MA 02110-1301, USA.
+#	   This program is free software; you can redistribute it and/or modify
+#	   it under the terms of the GNU General Public License as published by
+#	   the Free Software Foundation; either version 2 of the License, or
+#	   (at your option) any later version.
+#	   
+#	   This program is distributed in the hope that it will be useful,
+#	   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#	   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#	   GNU General Public License for more details.
+#	   
+#	   You should have received a copy of the GNU General Public License
+#	   along with this program; if not, write to the Free Software
+#	   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+#	   MA 02110-1301, USA.
 
 
 # Notes:
@@ -23,13 +23,23 @@
 # (Panel needed for tab-traversal. Perhaps we can 'full screen' it
 # 	just by calling it in X11 with no WM and size=Wx.DisplaySize() )
 
+#TODO Future:
+# - Add reports which tally each service and ministry.
+#	i.e. First service: 21 volunteers total
+#		 Second service: 32 volunteers total, etc.
+# - Add ability to edit/delete records.
 
 import wx
 from wx.lib.masked import TextCtrl as maskedTextCtrl
 import conf
 import datetime
-import conf
+import volunteerSQL as sql
+import csv
+import files
+import mail
+import pynotify
 
+pynotify.init("Dream Team Check-in")
 
 def as_bool(inp):
 	if inp == 'True':
@@ -42,7 +52,7 @@ config = conf.get()
 
 #config values
 programName = 'Journey Volunteer Check-in'
-programVersion = '0.0.1b'
+programVersion = '0.10.0'
 fullScreen = as_bool(config['fullScreen'])
 windowX = int(config['windowX'])
 windowY = int(config['windowY'])
@@ -51,19 +61,53 @@ backgroundColour = config['backgroundColour']
 
 #ADD TO CONFIG:
 services = ['First Servce', 'Second Service', 'Third Service']
-ministries = ['Café', 'Parking', 'Explorers', 'Explorers Check-in',
+ministries = [u'Café', 'Parking', 'Explorers', 'Explorers Check-in',
 	'Outfitters', 'Outfitters Check-in', 'Usher', 'Tech Team', 
-	'Counting', 'Greeter']
+	'Route 56 ', 'Greeter']
 selectedServices = []
 selectedMinistries = []
 global logFile
 logFile = 'database/report.csv'
+archiveFolder = 'database/archive/'  #MUST Have trailing slash
 
+
+#open log file, read first row's date column, and compare it to today.
+#if it is older, then rename the file to reflect the date.
+
+try:
+	f = open(logFile, 'rb')
+	f.close()
+except IOError:
+	f = open(logFile, 'w')
+	f.write('"ID","Name","Services served","Ministries served","Date","Time"\n')
+	f.close()
+f = open(logFile, 'rb')
+reader = csv.reader(f)
+readerTmp = []
+for row in reader:
+	readerTmp.append(row)
+f.close()
+print "Debug: latest write to CSV was '" + readerTmp[0][4]+"'"
+if readerTmp[0][4] != datetime.datetime.now().strftime("%a %d %B, %Y") and readerTmp[0][4] != 'Date':
+	#copy to archive file and clear the old file.
+	print "Debug: lastest write older than today; archiving data."
+	files.copy(logFile, archiveFolder+
+		datetime.datetime.now().strftime("%Y-%m-%d.csv"))
+	f = open(logFile, 'w')
+	f.write('"ID","Name","Services served","Ministries served","Date","Time"\n')
+	f.close()
+	print "Debug: CSV data reset."
+
+
+global database
+database = 'database/users.db'
+
+handler = sql.Database(database)
 
 global displayCentre
 global resultList
 global querySelection
-resultList = ['John Smith', 'Sussy Volunteer', 'James Helper']
+resultList = []
 
 class Main(wx.Frame):
 	"""make a frame, inherits wx.Frame"""
@@ -72,7 +116,7 @@ class Main(wx.Frame):
 		if fullScreen:
 			wx.Frame.__init__(self, None, wx.ID_ANY, 'Full display size',
 				pos=(0, 0), size=wx.DisplaySize())
-			self.ShowFullScreen(True)
+			#self.ShowFullScreen(True)
 			imageLeft = wx.DisplaySize()[0] - 1020
 		else:
 			wx.Frame.__init__(self, None, wx.ID_ANY, 'Taxidi', 
@@ -91,6 +135,7 @@ class Main(wx.Frame):
 		
 		self.SetTitle(programName+" ("+programVersion+")")
 		self.Show(True)
+		wx.EVT_CLOSE(self, self.OnQuit)
 		
 		displayCentre = int((self.GetClientSize()[0])/2)
 		
@@ -117,7 +162,7 @@ digits of phone number, or scan barcode.""",
 		self.search.SetFocus()
 		
 		self.searchb = wx.Button(self.panel, id=-1, label='Search',
-    	    pos=(displayCentre+300, 184), size=(180, 60))
+			pos=(displayCentre+300, 184), size=(180, 60))
 		self.searchb.Bind(wx.EVT_BUTTON, self.query)
 		self.searchb.SetToolTip(wx.ToolTip("Search for a record"))
 		
@@ -128,11 +173,15 @@ digits of phone number, or scan barcode.""",
 		
 		self.lastb = wx.Button(self.panel, id=-1, label='Last Search', 
 			pos=(displayCentre+300, 314), size=(180, 60))
-		self.lastb.SetToolTip(wx.ToolTip("Register a new entry"))
-		
+			
+		self.about = wx.Button(self.panel, id=-1, label='About',
+			pos=(displayCentre+300, 379), size=(180, 60)) 
+		self.about.Bind(wx.EVT_BUTTON, self.aboutTaxidi)
+				
 		self.stat = wx.Button(self.panel, id=-1, 
-			label='View/Print Report', pos=(displayCentre-480, 379), 
+			label='Email Report', pos=(displayCentre-480, 379), 
 			size=(260, 60))
+		self.stat.Bind(wx.EVT_BUTTON, self.report)
 	
 		self.exitb = wx.Button(self.panel, id=-1, label='Exit',	
 			pos=(displayCentre-210, 379), size=(260, 60))
@@ -156,7 +205,7 @@ digits of phone number, or scan barcode.""",
 		self.b8 = wx.Button(self.panel, id=-1, label='8', pos=(displayCentre+155, 314), size=(60, 60))
 		self.b9 = wx.Button(self.panel, id=-1, label='9', pos=(displayCentre+220, 314), size=(60, 60))
 		self.bAll = wx.Button(self.panel, id=-1, label='All',  pos=(displayCentre+90, 379), size=(60, 60))	
-		self.b0 = wx.Button(self.panel, id=-1, label='0',     pos=(displayCentre+155, 379), size=(60, 60))
+		self.b0 = wx.Button(self.panel, id=-1, label='0',	 pos=(displayCentre+155, 379), size=(60, 60))
 		self.bClr = wx.Button(self.panel, id=-1, label='Clr', pos=(displayCentre+220, 379), size=(60, 60))
 		
 		#bindings:
@@ -179,7 +228,7 @@ digits of phone number, or scan barcode.""",
 		
 		#setup search results page
 		self.st2 = wx.StaticText(self.panel, -1, 
-			"Search Results. Please highlight your name and press 'Continue'",
+			"Search Results. Please highlight your name and press 'Forward'",
 			pos=(displayCentre-490, 147))
 		self.st2.SetFont(font1)
 		self.st2.SetForegroundColour('black')
@@ -188,13 +237,18 @@ digits of phone number, or scan barcode.""",
 			pos=(displayCentre-490, 190), size=(968, 402), style=wx.LB_EXTENDED)
 		self.listBox.SetFont(entryfont)
 		
-		self.next1b = wx.Button(self.panel, id=-1, label='Continue',
-    	    pos=(displayCentre+300, 610), size=(180, 60))
+		self.next1b = wx.Button(self.panel, wx.ID_FORWARD,
+			pos=(displayCentre+300, 610), size=(180, 60))
 		self.next1b.Bind(wx.EVT_BUTTON, self.selectServices)
 		
-		self.back1b = wx.Button(self.panel, id=-1, label='Back',
+		self.back1b = wx.Button(self.panel, wx.ID_BACKWARD,
 			pos=(displayCentre+100, 610), size=(180, 60))
 		self.back1b.Bind(wx.EVT_BUTTON, self.backToSearch)
+		
+		self.deleteb = wx.Button(self.panel, wx.ID_DELETE,
+			pos=(displayCentre-490, 610), size=(180, 60))
+		self.deleteb.Bind(wx.EVT_BUTTON, self.deleteSelected)
+		 
 	
 				
 		#select services page
@@ -220,12 +274,12 @@ digits of phone number, or scan barcode.""",
 				temp=i: self.toggleService(evt, temp), id=-1)
 			
 				
-		self.next2b = wx.Button(self.panel, id=-1, label='Continue',
+		self.next2b = wx.Button(self.panel, wx.ID_FORWARD,
 			pos=(displayCentre+300, 610), size=(180, 60))
 		self.next2b.Bind(wx.EVT_BUTTON, self.selectMinistry)
 		self.next2b.Disable()
 		
-		self.back2b = wx.Button(self.panel, id=-1, label='Back',
+		self.back2b = wx.Button(self.panel, wx.ID_BACKWARD,
 			pos=(displayCentre+100, 610), size=(180, 60))
 		self.back2b.Bind(wx.EVT_BUTTON, self.backToResults)
 		
@@ -250,12 +304,12 @@ digits of phone number, or scan barcode.""",
 			self.ministryButtons[i].Bind(wx.EVT_TOGGLEBUTTON, lambda evt,
 				temp=i: self.toggleMinistry(evt, temp), id=-1)
 				
-		self.next3b = wx.Button(self.panel, id=-1, label='Continue',
+		self.next3b = wx.Button(self.panel, wx.ID_FORWARD,
 			pos=(displayCentre+300, 610), size=(180, 60))
 		self.next3b.Bind(wx.EVT_BUTTON, self.finalReview)
 		self.next3b.Disable()
 		
-		self.back3b = wx.Button(self.panel, id=-1, label='Back',
+		self.back3b = wx.Button(self.panel, wx.ID_BACKWARD,
 			pos=(displayCentre+100, 610), size=(180, 60))
 		self.back3b.Bind(wx.EVT_BUTTON, self.backToServices)
 		
@@ -268,13 +322,12 @@ digits of phone number, or scan barcode.""",
 			pos=(displayCentre+300, 610), size=(180, 60))
 		self.next4b.Bind(wx.EVT_BUTTON, self.submit)
 		
-		self.back4b = wx.Button(self.panel, id=-1, label='Back',
+		self.back4b = wx.Button(self.panel, wx.ID_BACKWARD,
 			pos=(displayCentre+100, 610), size=(180, 60))
 		self.back4b.Bind(wx.EVT_BUTTON, self.backToMinistries)
 		
 		
-		#register
-		
+		#register		
 		self.registerSt1 = wx.StaticText(self.panel, -1, "First:",
 			pos=((displayCentre-450), 195))
 		self.registerSt1.SetFont(entryfont)
@@ -313,25 +366,33 @@ digits of phone number, or scan barcode.""",
 			
 		self.registerAccept = wx.Button(self.panel, wx.ID_SAVE,
 			size=(200, 60), pos=((displayCentre+210), 580))
+		self.registerAccept.Bind(wx.EVT_BUTTON, self.registerSave)
 			
 		self.registerCancel = wx.Button(self.panel, wx.ID_CANCEL,
 			size=(200, 60), pos=((displayCentre), 580))
 		self.registerCancel.Bind(wx.EVT_BUTTON, self.registerCleanup)
-			
 		
-		#self.hideSearch()	
+		
 		self.hideResult()
 		self.hideServices()
 		self.hideMinistries()
 		self.hideFinish()
 		self.hideRegister()
-		#self.showRegister()
+		
+		
 
 		
 	#functions
 	def close(self, event):
-		self.Close()
-		application.ExitMainLoop()
+		dial = wx.MessageDialog(self, 
+			"Do you really want exit?",
+			"Confirm Exit", wx.OK|wx.CANCEL|wx.ICON_QUESTION)
+		result = dial.ShowModal()
+		dial.Destroy()
+		if result == wx.ID_OK:
+			self.Destroy()
+			self.Close()
+			application.ExitMainLoop()
 		
 	def b1Click(self, event):
 		self.search.AppendText('1')
@@ -390,6 +451,7 @@ digits of phone number, or scan barcode.""",
 			#display an error: No search results for '%s'
 			self.statusText.SetLabel('No results for "%s"' % query)
 			self.statusText.SetForegroundColour('dark red')
+			self.notice('Error: No results for "%s"' % query)
 			self.search.SelectAll()
 			self.search.SetFocus()
 			return 1
@@ -402,13 +464,19 @@ digits of phone number, or scan barcode.""",
 		self.listBox.Select(0)
 		self.listBox.SetFocus()
 		
-		#clean up
-		self.search.SetValue('')	#clear the query
-		#self.search.SetFocus()
-		
 	def query_test(self, query):
-		print "Doing database stuff.. searching for "+str(query)+"..."
-		resultList = [[14,'John Smith'], [18,'Sussy Volunteer'], [24,'James Helper']]
+		global handler
+		if query == '':
+			res = handler.ReturnAll()
+		else:
+			try:
+				query = int(query)
+			except ValueError:
+				query += "%"
+			res = handler.Query(query)
+		resultList = []
+		for i in res:
+			resultList.append([ i[0], i[1]+' '+i[2] ])
 		return resultList
 		
 	def backToSearch(self, event):
@@ -422,6 +490,29 @@ digits of phone number, or scan barcode.""",
 		self.hideResult()
 		self.showServices()
 		querySelection = self.listBox.GetSelections()[0]
+		
+	def deleteSelected(self, event):
+		global querySelection
+		global resultList
+		global handler
+		querySelection = self.listBox.GetSelections()[0]
+		name = resultList[querySelection][1]
+		dial = wx.MessageDialog(self, 
+			"Do you really want to delete %s?" % name,
+			"Confirm Delete", wx.OK|wx.CANCEL|wx.ICON_QUESTION)
+		result = dial.ShowModal()
+		dial.Destroy()
+		if result == wx.ID_OK:
+			a=handler.Delete(resultList[querySelection][0])
+			if a:
+				self.notice('The user "%s" was successfully removed' % name)
+			else:
+				self.notice('An error has occured.  Unable to remove entry')
+		#refresh the list
+		resultList = []
+		self.listBox.Clear()
+		self.query(None)
+	
 		
 	def backToServices(self, event):
 		self.hideMinistries()
@@ -511,6 +602,7 @@ digits of phone number, or scan barcode.""",
 		self.exitb.Hide()
 		self.stat.Hide()
 		self.lastb.Hide()
+		self.about.Hide()
 		
 	def showSearch(self):
 		self.b1.Show()
@@ -533,16 +625,18 @@ digits of phone number, or scan barcode.""",
 		self.exitb.Show()
 		self.stat.Show()
 		self.lastb.Show()
+		self.about.Show()
 		self.search.SetFocus()
-		self.statusText.SetLabel("""Ready: To begin, search by name, last four 
-digits of phone number, or scan barcode.""")
-		self.statusText.SetForegroundColour('dark green')
 		
 	def hideResult(self):
 		self.listBox.Hide()
 		self.st2.Hide()
 		self.next1b.Hide()
 		self.back1b.Hide()
+		self.deleteb.Hide()
+		self.statusText.SetLabel("""Ready: To begin, search by name, last four 
+digits of phone number, or scan barcode.""")
+		self.statusText.SetForegroundColour('dark green')
 		
 	def showResult(self):
 		self.st2.SetLabel("Search Results. Please highlight your name and press 'Continue'")
@@ -550,6 +644,7 @@ digits of phone number, or scan barcode.""")
 		self.st2.Show()
 		self.next1b.Show()
 		self.back1b.Show()
+		self.deleteb.Show()
 		
 	def showServices(self):
 		self.st2.SetLabel('Please select which services you will be serving')
@@ -590,7 +685,8 @@ digits of phone number, or scan barcode.""")
 		self.back4b.Hide()
 		
 	def showFinish(self):
-		self.st2.SetLabel('Please review the information below and press finish.')
+		self.st2.SetLabel(
+			'Please review the information below and press finish.')
 		self.st2.Show()
 		self.reviewText.Show()
 		self.next4b.Show()
@@ -631,6 +727,26 @@ digits of phone number, or scan barcode.""")
 		self.registerBarcode.SetValue('')
 		self.hideRegister()
 		self.showSearch()
+		
+	def registerSave(self, event):
+		first = self.registerFirst.GetValue()
+		last = self.registerLast.GetValue()
+		phone = self.registerPhone.GetValue()
+		barcode = self.registerBarcode.GetValue()
+		if '  ' in phone or len(phone) != 14:
+			dial = wx.MessageDialog(None, 'Invalid phone number.',
+				'Exclamation', wx.OK | wx.ICON_EXCLAMATION)
+			dial.ShowModal()
+			return 1
+			
+		#SQL to add a new row
+		handler.Add(first, last, phone[1:4], phone[6:9], phone[10:14], 
+			barcode)
+		self.statusText.SetLabel(
+			"%s was added successfully to the database" % first)
+		self.notice("%s was added successfully to the database" % first)
+		self.registerCleanup(event)
+		
 		
 	def Register(self, event):
 		self.hideSearch()
@@ -676,6 +792,7 @@ digits of phone number, or scan barcode.""")
 		selectedMinistries.sort()
 		servicesText = ''
 		ministriesText = ''
+		ministries = unicode(ministries)
 		a = 0
 		
 		for i in selectedServices:
@@ -689,6 +806,14 @@ digits of phone number, or scan barcode.""")
 			a += 1
 			endTest = not(a == len(selectedMinistries))
 			ministriesText += ministries[i]+', '*endTest
+			
+		f = open(logFile, 'rb')
+		line = f.readline()
+		f.close()
+		if line[:4] != '"ID"':
+			f = open(logFile, 'w')
+			f.write('"ID","Name","Services served","Ministries served","Date","Time"\n')
+			f.close()
 		
 		f = open(logFile, 'a')
 		id = resultList[querySelection][0]
@@ -699,8 +824,67 @@ digits of phone number, or scan barcode.""")
 			datetime.datetime.now().strftime("%H:%M:%S")+'"\n')
 		f.close()
 		return 0
+		
+	def report(self, event):
+		dial = wx.MessageDialog(self, 'Email report will be sent to info.journeychurch@gmail.com.',
+				'Confirm', wx.OK | wx.CANCEL | wx.ICON_QUESTION)
+		result = dial.ShowModal()
+		dial.Destroy()
+		if result == wx.ID_OK:
+			global logFile
+			result = mail.send('info.journeychurch@gmail.com', logFile)
+			if result == 13:
+				dial = wx.MessageDialog(None, 'Report file does not exist!',
+					'Error', wx.OK | wx.ICON_ERROR)
+				dial.ShowModal()
+				dial.Destroy()
+			if result == 0:
+				#dial = wx.MessageDialog(None, 'Report sent.',
+				#	'Information', wx.OK | wx.ICON_INFORMATION)
+				#dial.ShowModal()
+				#dial.Destroy()
+				self.notice("Report was sent successfully.")
+		self.showSearch()
+		
+	def notice(self, message):
+		icon = "info"
+		if "error" in message.lower():
+			icon = "error"
+		if "add" in message.lower():
+			icon = "add"
+		if "success" in message.lower():
+			icon = "dialog-ok"
+		n = pynotify.Notification("Taxidi", message, icon)
+		n.show()		
 	
+	def OnQuit(self, event):
+		global handler
+		handler.Close()
+		self.Destroy()
+		
+	def aboutTaxidi(self, event):
+		info = wx.AboutDialogInfo()
+		info.SetIcon(wx.Icon('resources/icon.png', wx.BITMAP_TYPE_PNG))
+		info.SetName('Taxídí')
+		info.SetVersion('0.10.0')
+		info.SetDescription("""Taxídí is a volunteer tracking and nursery attendance database.
+This version is a pre-alpha release inteded to track volunteers and create statistics for Journey Church of Millbrook, Alabama""")
+		info.SetCopyright('© 2011 Zac Sturgeon')
+		info.SetWebSite('http://www.jkltech.net/taxidi')
+		info.SetLicence("""Taxidi is free software; you can redistribute it and/or modify it 
+under the terms of the GNU General Public License as published by the Free Software Foundation; 
+either version 3 of the License, or (at your option) any later version.
 
+Taxidi is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+See the GNU General Public License for more details. You should have received a copy of 
+the GNU General Public License along with File Hunter; if not, write to 
+the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA""")
+		info.AddDeveloper('Zac Sturgeon')
+		info.AddDocWriter('Zac Sturgeon')
+		wx.AboutBox(info)
+		self.search.SetFocus()
+		
 		
 		
 application = wx.PySimpleApp()
