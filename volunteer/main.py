@@ -792,7 +792,6 @@ digits of phone number, or scan barcode.""")
 		selectedMinistries.sort()
 		servicesText = ''
 		ministriesText = ''
-		ministries = unicode(ministries)
 		a = 0
 		
 		for i in selectedServices:
